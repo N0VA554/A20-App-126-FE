@@ -12,6 +12,10 @@ import {
   LogOut,
   Bell,
   Search,
+  MessageSquare,
+  FileText,
+  GraduationCap,
+  Calendar,
 } from "lucide-react";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -26,14 +30,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     user?.role === "LECTURER"
       ? [
           { href: "/lecturer", label: "Tổng quan", Icon: LayoutDashboard },
+          { href: "/lecturer/schedule", label: "Lịch giảng dạy", Icon: CalendarCheck2 },
           { href: "/lecturer/classes", label: "Lớp học của tôi", Icon: Users },
-          { href: "/lecturer/settings", label: "Cấu hình ngưỡng", Icon: SlidersHorizontal },
+          
         ]
       : [
-          { href: "/student", label: "Tổng quan", Icon: LayoutDashboard },
-          { href: "/student/plan", label: "Kế hoạch học tập", Icon: CalendarCheck2 },
-          { href: "/student/support", label: "Hỗ trợ", Icon: LifeBuoy },
-        ];
+    { href: "/student", label: "Tổng quan", Icon: LayoutDashboard },
+    { href: "/student/calendar", label: "Thời khóa biểu", Icon: Calendar },
+    { href: "/student/grades", label: "Điểm số", Icon: GraduationCap },
+    { href: "/student/leave", label: "Nghỉ phép", Icon: FileText },
+    { href: "/student/chatbot", label: "AI Assistant", Icon: MessageSquare },
+  ];
 
   const handleLogout = () => {
     logout();

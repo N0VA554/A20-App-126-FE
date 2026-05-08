@@ -120,51 +120,7 @@ export default function StudentPage() {
         </div>
       </div>
 
-      {/* Bảng Deadline & Lịch học - Đồng bộ style Table với Lecturer */}
-      <div className={styles.tableWrapper}>
-        <div className={styles.tableHeader}>
-          <div>
-            <h3 className={styles.tableTitle}>Thời khóa biểu & Deadline</h3>
-            <p className={styles.tableSubtitle}>Thông tin chi tiết các lớp học trong tuần</p>
-          </div>
-          <div className={styles.tableActions}>
-            <button className={styles.secondaryBtn}>Đồng bộ Google Calendar</button>
-          </div>
-        </div>
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th>Thời gian</th>
-              <th>Môn học</th>
-              <th>Trạng thái</th>
-              <th>Địa điểm</th>
-              <th>Hành động</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td className={styles.boldCell}>Thứ 2, 08:00</td>
-              <td>
-                <div className={styles.studentName}>Machine Learning</div>
-                <div className={styles.studentId}>Lecture • Prof. Nguyen Van A</div>
-              </td>
-              <td><span className={styles.badgeGold}>Sắp diễn ra</span></td>
-              <td>Phòng C201</td>
-              <td><button className={styles.actionBtn}>Tài liệu</button></td>
-            </tr>
-            <tr>
-              <td className={styles.boldCell}>Thứ 4, 13:30</td>
-              <td>
-                <div className={styles.studentName}>Data Structures</div>
-                <div className={styles.studentId}>Lab • Mr. Le Haan</div>
-              </td>
-              <td><span className={styles.badgeRed}>Cảnh báo Deadline</span></td>
-              <td>Lab 102</td>
-              <td><button className={styles.actionBtn}>Nộp bài</button></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      
     </div>
   );
 }

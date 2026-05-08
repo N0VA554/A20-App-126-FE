@@ -1,0 +1,46 @@
+.chatContainer {
+  display: grid; grid-template-columns: 280px 1fr;
+  height: calc(100vh - 180px); background: white;
+  border-radius: 24px; border: 1px solid #eef1f7; overflow: hidden;
+}
+
+.sidebar { background: #f8fafc; border-right: 1px solid #eef1f7; display: flex; flex-direction: column; }
+.sidebarHeader { padding: 1.5rem; }
+.newChatBtn {
+  width: 100%; padding: 0.85rem; border: 1.5px solid #003366; background: transparent;
+  color: #003366; border-radius: 12px; font-weight: 700; display: flex;
+  align-items: center; justify-content: center; gap: 0.5rem; cursor: pointer; transition: 0.2s;
+}
+.newChatBtn:hover { background: #003366; color: white; }
+
+.historyScroll { flex: 1; padding: 0 1rem; overflow-y: auto; }
+.groupLabel { font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; margin: 1.5rem 0 0.75rem 0.5rem; font-weight: 700; }
+.historyCard, .historyCardActive {
+  padding: 0.75rem 1rem; border-radius: 12px; font-size: 0.9rem; cursor: pointer; margin-bottom: 0.25rem;
+}
+.historyCard:hover { background: #f1f5f9; }
+.historyCardActive { background: #003366; color: white; font-weight: 600; }
+
+.mainChat { display: flex; flex-direction: column; background: white; }
+.chatHeader { padding: 1.25rem 2rem; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; }
+.aiInfo { display: flex; align-items: center; gap: 1rem; }
+.aiAvatar { width: 42px; height: 42px; background: #003366; color: #C5A25D; border-radius: 12px; display: grid; place-items: center; }
+.aiInfo h3 { font-size: 1rem; color: #003366; font-weight: 700; }
+.status { font-size: 0.7rem; color: #10b981; font-weight: 600; }
+
+.messageArea { flex: 1; padding: 2rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1.5rem; }
+.botRow, .userRow { display: flex; gap: 1rem; max-width: 85%; }
+.userRow { align-self: flex-end; flex-direction: row-reverse; }
+
+.avatarPill { width: 32px; height: 32px; border-radius: 50%; background: #f1f5f9; display: grid; place-items: center; flex-shrink: 0; }
+.botRow .bubble { background: #f8fafc; border: 1px solid #eef1f7; padding: 1rem 1.25rem; border-radius: 4px 20px 20px 20px; color: #1e293b; line-height: 1.6; }
+.userRow .bubble { background: #003366; color: white; padding: 1rem 1.25rem; border-radius: 20px 4px 20px 20px; box-shadow: 0 4px 15px rgba(0, 51, 102, 0.2); }
+
+.inputArea { padding: 1.5rem 2rem; border-top: 1px solid #f1f5f9; }
+.suggestGrid { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+.chip { padding: 0.4rem 0.9rem; border-radius: 99px; border: 1px solid #e2e8f0; background: white; font-size: 0.8rem; cursor: pointer; transition: 0.2s; }
+.chip:hover { border-color: #C5A25D; color: #C5A25D; }
+
+.inputWrapper { display: flex; gap: 0.75rem; background: #f1f5f9; padding: 0.6rem 0.6rem 0.6rem 1.5rem; border-radius: 16px; }
+.inputWrapper input { flex: 1; border: none; background: transparent; outline: none; font-size: 0.95rem; }
+.sendBtn { width: 44px; height: 44px; background: #003366; color: white; border: none; border-radius: 12px; cursor: pointer; }
