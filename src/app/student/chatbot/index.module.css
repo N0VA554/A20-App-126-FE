@@ -1,7 +1,100 @@
 .chatContainer {
-  display: grid; grid-template-columns: 280px 1fr;
-  height: calc(100vh - 180px); background: white;
-  border-radius: 24px; border: 1px solid #eef1f7; overflow: hidden;
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  /* Quan trọng: Cố định chiều cao theo viewport để tránh vỡ UI */
+  height: calc(100vh - 140px); 
+  background: white;
+  border-radius: 24px;
+  border: 1px solid #eef1f7;
+  overflow: hidden; /* Cắt bỏ phần thừa của sidebar và mainChat */
+  box-shadow: 0 10px 40px rgba(0,0,0,0.04);
+}
+
+.sidebar {
+  background: #f8fafc;
+  border-right: 1px solid #eef1f7;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.mainChat {
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* Chiếm trọn chiều cao container */
+  overflow: hidden;
+}
+
+.messageArea {
+  flex: 1; /* Tự động giãn nở để chiếm không gian trống */
+  overflow-y: auto; /* Tạo thanh cuộn riêng cho vùng tin nhắn */
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  background: #ffffff;
+  scroll-behavior: smooth;
+}
+
+/* Định dạng Rich Text bên trong Bubble */
+.bubble {
+  max-width: 85%;
+  padding: 1rem 1.25rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  word-break: break-word; /* Chống vỡ dòng khi text quá dài */
+}
+
+.bubble strong { font-weight: 700; color: inherit; }
+.bubble ul, .bubble ol { margin-left: 1.5rem; margin-top: 0.5rem; }
+.bubble table { border-collapse: collapse; width: 100%; margin: 10px 0; border: 1px solid #ddd; }
+.bubble th, .bubble td { border: 1px solid #ddd; padding: 8px; font-size: 0.85rem; }
+
+.botRow .bubble {
+  background: #f8fafc;
+  border: 1px solid #eef1f7;
+  border-radius: 4px 20px 20px 20px;
+  color: #1e293b;
+}
+
+.userRow .bubble {
+  background: #003366;
+  color: white;
+  border-radius: 20px 4px 20px 20px;
+  align-self: flex-end;
+}
+
+.userRow { align-self: flex-end; flex-direction: row-reverse; }
+
+.inputArea {
+  padding: 1.5rem 2rem;
+  background: white;
+  border-top: 1px solid #f1f5f9;
+}
+
+.inputWrapper {
+  display: flex;
+  gap: 0.75rem;
+  background: #f1f5f9;
+  padding: 0.6rem 0.6rem 0.6rem 1.5rem;
+  border-radius: 16px;
+}
+
+.inputWrapper input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 0.95rem;
+}
+
+.spinner { animation: spin 1s linear infinite; }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+.loadingBubble {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  padding: 0.5rem;
 }
 
 .sidebar { background: #f8fafc; border-right: 1px solid #eef1f7; display: flex; flex-direction: column; }
@@ -44,3 +137,17 @@
 .inputWrapper { display: flex; gap: 0.75rem; background: #f1f5f9; padding: 0.6rem 0.6rem 0.6rem 1.5rem; border-radius: 16px; }
 .inputWrapper input { flex: 1; border: none; background: transparent; outline: none; font-size: 0.95rem; }
 .sendBtn { width: 44px; height: 44px; background: #003366; color: white; border: none; border-radius: 12px; cursor: pointer; }
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.loadingBubble {
+  font-style: italic;
+  color: #888;
+}

@@ -1,62 +1,132 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import styles from "./index.module.css";
-import { Send, Bot, Sparkles, User, History, Settings, Zap } from "lucide-react";
+import { postJson } from "@/src/lib/api/http";
+import { PUBLIC_API_BASE_URL } from "@/src/lib/api/config";
+import { Send, Bot, Sparkles, User, Settings, Zap, Loader2 } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+
+interface Message {
+  role: "user" | "assistant";
+  content: string;
+}
 
 export default function ChatbotPage() {
-  const [messages] = useState([
-    { role: 'bot', text: 'Chào bạn! Tôi là VinUni AI. Tôi đã phân tích điểm Lab 1 môn ML của bạn (8.5/10). Bạn có muốn biết cách tối ưu bài Lab 2 để kéo GPA lên không?' },
-    { role: 'user', text: 'Có, hãy gợi ý cho mình một vài tài liệu bổ sung.' },
+  const [messages, setMessages] = useState<Message[]>([
+    { 
+      role: "assistant", 
+      content: "Chào bạn! Tôi là **Trợ lý Học vụ AI**. Tôi có thể giúp bạn: \n- Phân tích lộ trình học tập \n- Giải đáp quy chế \n- Cảnh báo rủi ro học vụ \n\nHãy nhập câu hỏi của bạn hoặc chọn một gợi ý bên dưới nhé!" 
+    }
   ]);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll mỗi khi có tin nhắn mới hoặc đang loading
+  const scrollToBottom = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo({
+        top: scrollRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, loading]);
+
+  const handleSend = async (text: string = input) => {
+    if (!text.trim() || loading) return;
+    const userMsg = text.trim();
+    setInput("");
+    setMessages((prev) => [...prev, { role: "user", content: userMsg }]);
+    setLoading(true);
+
+    try {
+      const apiUrl = `${PUBLIC_API_BASE_URL || "http://127.0.0.1:5000/api/v1/"}chat`;
+      const history = messages.slice(-6).map((m) => ({ role: m.role, content: m.content }));
+      const res = await postJson<{ success: boolean; data: { reply: string } }>(
+        apiUrl, { message: userMsg, history }
+      );
+      if (res.success) {
+        setMessages((prev) => [...prev, { role: "assistant", content: res.data.reply }]);
+      }
+    } catch (error) {
+      setMessages((prev) => [...prev, { role: "assistant", content: "⚠️ **Lỗi kết nối**: Không thể liên lạc với server AI." }]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className={styles.chatContainer}>
-      {/* Sidebar Chat History */}
-      <div className={styles.sidebar}>
+      <aside className={styles.sidebar}>
         <div className={styles.sidebarHeader}>
-          <button className={styles.newChatBtn}><Zap size={16} /> Hội thoại mới</button>
+          <button className={styles.newChatBtn} onClick={() => setMessages([messages[0]])}>
+            <Zap size={16} /> Hội thoại mới
+          </button>
         </div>
         <div className={styles.historyScroll}>
           <p className={styles.groupLabel}>Gần đây</p>
-          <div className={styles.historyCardActive}>Phân tích điểm ML Lab 1</div>
-          <div className={styles.historyCard}>Lộ trình học Deep Learning</div>
-          <div className={styles.historyCard}>Thủ tục bảo lưu tín chỉ</div>
+          <div className={styles.historyCardActive}>Trợ lý Học vụ AI</div>
+          <div className={styles.historyCard}>Lộ trình học AI & Data</div>
         </div>
-      </div>
+      </aside>
 
-      {/* Main Chat Area */}
       <div className={styles.mainChat}>
-        <div className={styles.chatHeader}>
+        <header className={styles.chatHeader}>
           <div className={styles.aiInfo}>
             <div className={styles.aiAvatar}><Sparkles size={20} /></div>
             <div>
-              <h3>AI Assistant</h3>
-              <span className={styles.status}>Dữ liệu cập nhật: 2 phút trước</span>
+              <h3>VinUni AI Assistant</h3>
+              <span className={styles.status}>{loading ? "AI đang soạn câu trả lời..." : "Trực tuyến"}</span>
             </div>
           </div>
           <button className={styles.configBtn}><Settings size={18} /></button>
-        </div>
+        </header>
 
-        <div className={styles.messageArea}>
+        {/* Phần tin nhắn: Đã fix Scroll */}
+        <div className={styles.messageArea} ref={scrollRef}>
           {messages.map((msg, i) => (
-            <div key={i} className={msg.role === 'bot' ? styles.botRow : styles.userRow}>
+            <div key={i} className={msg.role === 'assistant' ? styles.botRow : styles.userRow}>
               <div className={styles.avatarPill}>
-                {msg.role === 'bot' ? <Bot size={16} /> : <User size={16} />}
+                {msg.role === 'assistant' ? <Bot size={16} /> : <User size={16} />}
               </div>
-              <div className={styles.bubble}>{msg.text}</div>
+              <div className={styles.bubble}>
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  {msg.content}
+                </ReactMarkdown>
+              </div>
             </div>
           ))}
+          {loading && (
+            <div className={styles.botRow}>
+              <div className={styles.avatarPill}><Loader2 size={16} className={styles.spinner} /></div>
+              <div className={styles.loadingBubble}>Đang phân tích dữ liệu...</div>
+            </div>
+          )}
         </div>
 
         <div className={styles.inputArea}>
           <div className={styles.suggestGrid}>
-            <button className={styles.chip}>Dự báo điểm cuối kỳ</button>
-            <button className={styles.chip}>Giải thích quy chế vắng mặt</button>
-            <button className={styles.chip}>Tìm Mentor cho môn Toán</button>
+            <button className={styles.chip} onClick={() => handleSend("Lộ trình học")}>Lộ trình học</button>
+            <button className={styles.chip} onClick={() => handleSend("Quy chế cấm thi")}>Quy chế cấm thi</button>
+            <button className={styles.chip} onClick={() => handleSend("Quy chế vắng mặt")}>Quy chế vắng mặt</button>
           </div>
           <div className={styles.inputWrapper}>
-            <input type="text" placeholder="Hỏi AI về lộ trình học tập của bạn..." />
-            <button className={styles.sendBtn}><Send size={18} /></button>
+            <input 
+              type="text" 
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSend()}
+              placeholder="Nhập câu hỏi tại đây..." 
+            />
+            <button className={styles.sendBtn} onClick={() => handleSend()} disabled={loading || !input.trim()}>
+              <Send size={18} />
+            </button>
           </div>
         </div>
       </div>
