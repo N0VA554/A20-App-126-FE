@@ -1,0 +1,170 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Header Stats Row */
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.statCard {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 1.5rem;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+}
+
+.statInfo p {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #64748b;
+  margin-bottom: 0.5rem;
+}
+
+.statInfo h3 { font-size: 1.5rem; font-weight: 600; }
+
+.statIcon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bgGold { background: #fefce8; color: #a16207; }
+.bgNavy { background: #eff6ff; color: #1e40af; }
+.bgEmerald { background: #ecfdf5; color: #065f46; }
+
+/* Main Content Grid */
+.contentGrid {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 1.5rem;
+}
+
+@media (max-width: 1100px) {
+  .contentGrid { grid-template-columns: 1fr; }
+}
+
+/* Left Panel: Course Selection */
+.coursePanel {
+  background: white;
+  border-radius: 1.5rem;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+}
+
+.panelHeader {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #f1f5f9;
+  background: #f8fafc;
+}
+
+.panelHeader h3 { font-weight: 700; font-size: 1.125rem; }
+
+.courseList { display: flex; flex-direction: column; }
+
+.courseItem {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #f1f5f9;
+  display: flex;
+  gap: 1.25rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.courseItem:hover { background: #fafafa; }
+
+.checkbox {
+  width: 1.25rem;
+  height: 1.25rem;
+  accent-color: #0f172a;
+  margin-top: 0.25rem;
+}
+
+.courseCode { font-family: monospace; font-weight: 700; color: #003366; font-size: 0.875rem; }
+.courseName { font-weight: 600; font-size: 1rem; margin: 0.25rem 0; }
+.courseMeta { font-size: 0.875rem; color: #64748b; display: flex; gap: 1rem; }
+
+/* Right Side Panel */
+.sidePanel { display: flex; flex-direction: column; gap: 1.5rem; }
+
+.simulationCard {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 1.5rem;
+  border: 1px solid #e2e8f0;
+}
+
+.simTitle { font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+
+.totalCredits { font-size: 2rem; font-weight: 700; color: #0f172a; }
+
+.statusBox {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.valid { background: #f0fdf4; color: #166534; }
+.warning { background: #fffbeb; color: #92400e; margin-bottom: 0.5rem; }
+
+.submitBtn {
+  width: 100%;
+  margin-top: 1.25rem;
+  background: #0f172a;
+  color: white;
+  padding: 0.875rem;
+  border-radius: 1rem;
+  font-weight: 700;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.submitBtn:disabled { background: #e2e8f0; color: #94a3b8; cursor: not-allowed; }
+
+/* Timetable Preview */
+.timetableBox {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.timeSlot {
+  background: #f8fafc;
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  border: 1px solid #f1f5f9;
+  font-size: 0.8125rem;
+}
+
+.timeSlot strong { display: block; margin-bottom: 0.25rem; color: #1e293b; }
+
+/* Blocked Courses */
+.blockedCard {
+  background: #fef2f2;
+  border: 1px solid #fee2e2;
+  padding: 1.25rem;
+  border-radius: 1.5rem;
+}
+
+.blockedTitle { color: #991b1b; font-weight: 700; font-size: 0.875rem; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem; }
+
+.blockedItem { font-size: 0.8125rem; color: #7f1d1d; margin-bottom: 0.5rem; }

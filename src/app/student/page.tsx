@@ -1,126 +1,186 @@
 "use client";
+
 import styles from "./index.module.css";
-import { TOP_10_RISK } from "@/src/lib/data";
 import { useAuth } from "@/src/context/AuthContext";
+import { useEffect, useState } from "react";
 import { 
   BookOpen, 
-  Calendar, 
-  CheckCircle2, 
-  AlertCircle, 
   TrendingUp, 
-  Clock 
+  AlertCircle, 
+  CheckCircle2, 
+  UserCircle, 
+  Activity,
+  Award,
+  Zap
 } from "lucide-react";
+import {
+  fetchStudentClasses,
+  fetchStudentEWS,
+  fetchStudentGPA,
+  fetchStudentPrediction,
+  type AdministrativeClass,
+  type EWSRisk,
+  type GPAReport,
+  type PredictionResult,
+  type StudentClass,
+} from "@/src/lib/api/ews";
 
-export default function StudentPage() {
+export default function StudentEWSPage() {
   const { user } = useAuth();
-  const myData = TOP_10_RISK[0]; // Dữ liệu giả lập
+  const studentId = user?.username || "SV001";
+
+  const [ews, setEws] = useState<EWSRisk | null>(null);
+  const [gpa, setGpa] = useState<GPAReport | null>(null);
+  const [pred, setPred] = useState<PredictionResult | null>(null);
+  const [adminClass, setAdminClass] = useState<AdministrativeClass | null>(null);
+  const [subjects, setSubjects] = useState<StudentClass[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    Promise.all([
+      fetchStudentEWS(studentId),
+      fetchStudentGPA(studentId),
+      fetchStudentPrediction(studentId),
+      fetchStudentClasses(),
+    ])
+      .then(([e, g, p, classPayload]) => {
+        setEws(e);
+        setGpa(g);
+        setPred(p);
+        setAdminClass(classPayload.administrative_class);
+        setSubjects(classPayload.subjects);
+      })
+      .finally(() => setLoading(false));
+  }, [studentId]);
+
+  const riskClass = ews?.level === "danger" ? styles.riskDanger 
+                  : ews?.level === "warning" ? styles.riskWarning 
+                  : styles.riskSafe;
+
+  if (loading) return <div className={styles.statCard}>Đang nạp dữ liệu EWS...</div>;
 
   return (
-    <div className={styles.container}>
-      {/* Hero Section - Đồng bộ với Lecturer */}
+    <div className={styles.wrapper}>
+      {/* 1. Hero Greeting */}
       <section className={styles.hero}>
         <div>
-          <h2 className={styles.heroTitle}>
-            Chào {user?.full_name?.split(" ").pop() || "Sinh viên"},
-          </h2>
-          <p className={styles.heroSubtitle}>
-            Hệ thống AI đã cập nhật lộ trình học tập cá nhân hóa của bạn.
-          </p>
+          <h2 className={styles.heroTitle}>Chào {user?.full_name?.split(" ").pop()},</h2>
+          <p className={styles.heroSubtitle}>Hệ thống AI đã phân tích xong tình trạng học thuật của bạn.</p>
         </div>
-        <div className={styles.heroRight}>
-          <div className={styles.weekPill}>Tuần 6 • Semester 2</div>
-          <div className={styles.refreshHint}>Cập nhật: 2 phút trước</div>
+        <div className={styles.statCard} style={{padding: '0.5rem 1rem', borderStyle: 'dashed'}}>
+           <span className={styles.statLabel}>ID: {studentId}</span>
         </div>
       </section>
 
-      {/* Stats Grid - 4 Chỉ số chính */}
-      <section className={styles.statsGrid}>
+      {/* 2. Stats Row - 4 KPI Cards */}
+      <div className={styles.statsRow}>
         <div className={styles.statCard}>
-          <p className={styles.statLabel}>GPA Hiện tại</p>
-          <p className={`${styles.statValue} ${styles.colorGold}`}>{myData.avgGrade.toFixed(2)}</p>
-          <p className={styles.statFoot}>Tăng 0.15 so với tuần 5</p>
-        </div>
-        <div className={styles.statCard}>
-          <p className={styles.statLabel}>Chuyên cần</p>
-          <p className={styles.statValue}>{100 - myData.absentRate}%</p>
-          <p className={styles.statFoot}>Vắng mặt: {myData.absentRate / 10} buổi</p>
-        </div>
-        <div className={`${styles.statCard} ${myData.status === "RED" ? styles.statCardRed : styles.statCardGold}`}>
-          <p className={styles.statLabel}>Mức độ rủi ro</p>
-          <p className={styles.statValue}>{myData.score}</p>
-          <p className={styles.statFoot}>Dựa trên hành vi học tập</p>
-        </div>
-        <div className={styles.statCard}>
-          <p className={styles.statLabel}>Bài tập hoàn thành</p>
-          <p className={styles.statValue}>12/15</p>
-          <p className={styles.statFoot}>Còn 3 bài trong tuần này</p>
-        </div>
-      </section>
-
-      {/* Main Content Grid */}
-      <div className={styles.insightsGrid}>
-        {/* Cột trái: Gợi ý từ AI & Lộ trình */}
-        <div className={styles.panel}>
-          <div className={styles.panelHeader}>
-            <h3>Gợi ý lộ trình từ AI</h3>
-            <span className={styles.panelTag}>AI Coach</span>
-          </div>
-          <div className={styles.learningProgress}>
-            <div className={styles.progressItem}>
-              <div className={styles.progressInfo}>
-                <span>Lý thuyết xác suất (Tuần 6)</span>
-                <span>80%</span>
-              </div>
-              <div className={styles.progressBar}><div className={styles.progressFill} style={{width: '80%'}}></div></div>
-            </div>
-            <div className={styles.progressItem}>
-              <div className={styles.progressInfo}>
-                <span>Thực hành Python nâng cao</span>
-                <span>45%</span>
-              </div>
-              <div className={styles.progressBar}><div className={styles.progressFill} style={{width: '45%'}}></div></div>
-            </div>
-          </div>
-          <ul className={styles.insightList} style={{ marginTop: '1.5rem' }}>
-            <li><CheckCircle2 size={16} className={styles.iconGreen} /> Hoàn thành Lab 04 trước 23:59 Chủ Nhật.</li>
-            <li><TrendingUp size={16} className={styles.iconBlue} /> Cần tập trung hơn vào phần Linear Regression.</li>
-            <li><AlertCircle size={16} className={styles.iconRed} /> Bạn có 1 bài quiz sắp hết hạn sau 4 giờ.</li>
-          </ul>
+          <span className={styles.statLabel}>GPA Tích lũy</span>
+          <div className={styles.statValue} style={{color: '#d4af37'}}>{gpa?.cumulative_gpa4?.toFixed(2)}</div>
+          <span className={styles.statFoot}>{gpa?.gpa4_classification}</span>
         </div>
 
-        {/* Cột phải: Việc cần làm (To-do) chuyên nghiệp */}
-        <div className={styles.panel}>
-          <div className={styles.panelHeader}>
-            <h3>Việc cần làm hôm nay</h3>
-            <button className={styles.panelLink}>Xem tất cả</button>
-          </div>
-          <div className={styles.todoContainer}>
-            <div className={styles.todoCard}>
-              <input type="checkbox" id="t1" defaultChecked />
-              <label htmlFor="t1">
-                <strong>Ôn tập Slide 06</strong>
-                <span>Hạn chót: 14:00 hôm nay</span>
-              </label>
-            </div>
-            <div className={styles.todoCard}>
-              <input type="checkbox" id="t2" />
-              <label htmlFor="t2">
-                <strong>Làm Quiz tuần 6</strong>
-                <span>Hệ thống AI & Data</span>
-              </label>
-            </div>
-            <div className={styles.todoCard}>
-              <input type="checkbox" id="t3" />
-              <label htmlFor="t3">
-                <strong>Nộp bản thảo Research</strong>
-                <span>Hạn chót: Ngày mai</span>
-              </label>
-            </div>
-          </div>
+        <div className={styles.statCard}>
+          <span className={styles.statLabel}>Chuyên cần</span>
+          <div className={styles.statValue}>{ews ? `${(100 - ews.absence_pct).toFixed(1)}%` : "—"}</div>
+          <span className={styles.statFoot}>Vắng KP: {ews?.absence_pct}%</span>
+        </div>
+
+        <div className={`${styles.statCard} ${riskClass}`}>
+          <span className={styles.statLabel}>Rủi ro EWS</span>
+          <div className={styles.statValue}>{ews?.risk_score} <span style={{fontSize: '1rem'}}>/100</span></div>
+          <span className={styles.statFoot}>{ews?.level_label}</span>
+        </div>
+
+        <div className={styles.statCard}>
+          <span className={styles.statLabel}>Tín chỉ đạt</span>
+          <div className={styles.statValue}>{gpa?.total_credits}</div>
+          <span className={styles.statFoot}>Tín chỉ đã học: {gpa?.total_credits_all}</span>
         </div>
       </div>
 
-      
+      {/* 3. Content Grid */}
+      <div className={styles.contentGrid}>
+        
+        {/* Main Column: Classes & Subjects */}
+        <div className={styles.mainPanel}>
+          <div className={styles.panel}>
+            <div className={styles.panelHeader}>
+              <h3><UserCircle size={18}  /> Lớp hành chính</h3>
+              <span className={styles.statLabel}>{adminClass?.class_name}</span>
+            </div>
+            <div style={{padding: '1.5rem'}}>
+              <strong>{adminClass?.class_name || "Chưa phân lớp"}</strong>
+              <p className={styles.heroSubtitle}>Khóa {adminClass?.cohort_year} • Học kỳ {adminClass?.current_semester}</p>
+            </div>
+          </div>
+
+          <div className={styles.panel}>
+            <div className={styles.panelHeader}>
+              <h3><BookOpen size={18}  /> Môn học kỳ này</h3>
+            </div>
+            <div className={styles.classGrid}>
+              {subjects.map((item) => (
+                <div key={item.course_id} className={styles.classCard}>
+                  <p className={styles.courseCode}>{item.course_code}</p>
+                  <p className={styles.courseName}>{item.course_name}</p>
+                  <div className={styles.statFoot} style={{display: 'flex', justifyContent: 'space-between', marginTop: '8px'}}>
+                    <span>Điểm: {item.weighted_score?.toFixed(1) || "—"}</span>
+                    <span>Vắng: {item.absence_pct}%</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Side Column: AI Insights & Alerts */}
+        <div className={styles.sidePanel}>
+          <div className={styles.panel}>
+            <div className={styles.panelHeader}>
+              <h3><Zap size={18}  /> AI Prediction</h3>
+            </div>
+            <div className={styles.insightList}>
+              <div className={styles.infoBox} style={{padding: '1rem', background: '#f8fafc', borderRadius: '1rem'}}>
+                <p className={styles.statLabel}>Dự báo GPA kỳ tới</p>
+                <div className={styles.statValue} style={{fontSize: '1.25rem'}}>{pred?.predicted_gpa4?.toFixed(2)}</div>
+                <p className={styles.statFoot}>Xu hướng: {pred?.trend_label}</p>
+              </div>
+              
+              <div style={{marginTop: '1.5rem'}}>
+                <p className={styles.statLabel}>Rủi ro thôi học</p>
+                <p style={{fontWeight: 700, color: pred?.dropout_risk_label === "Thấp" ? '#10b981' : '#ef4444'}}>
+                  {pred?.dropout_risk_label}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.panel}>
+            <div className={styles.panelHeader}>
+              <h3><AlertCircle size={18}  /> Cảnh báo quan trọng</h3>
+            </div>
+            <div className={styles.insightList}>
+              {ews?.warnings.map((w, i) => (
+                <div key={i} className={`${styles.insightItem} ${styles.bgWarning}`}>
+                  <AlertCircle size={16} /> {w}
+                </div>
+              ))}
+              {gpa?.failed_courses.map((c, i) => (
+                <div key={i} className={`${styles.insightItem} ${styles.bgDanger}`}>
+                  <Activity size={16} /> F: {c.course_name}
+                </div>
+              ))}
+              {(!ews?.warnings.length && !gpa?.failed_courses.length) && (
+                <div className={`${styles.insightItem} ${styles.bgSafe}`} style={{background: '#f0fdf4', color: '#166534'}}>
+                  <CheckCircle2 size={16} /> Mọi thứ đều ổn!
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+      </div>
     </div>
   );
 }

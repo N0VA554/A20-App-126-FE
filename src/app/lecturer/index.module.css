@@ -113,6 +113,38 @@
   gap: 1.5rem;
 }
 
+.governanceGrid {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 1.5rem;
+}
+
+.metricRow {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.metricMini {
+  border-radius: 16px;
+  border: 1px solid #eef1f7;
+  background: #fbfcff;
+  padding: 0.9rem;
+}
+
+.metricMini strong {
+  display: block;
+  color: #003366;
+  font-size: 1.35rem;
+}
+
+.metricMini span {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.78rem;
+  color: rgba(11, 26, 43, 0.58);
+}
+
 .panel {
   background: white;
   border-radius: 24px;
@@ -258,6 +290,11 @@
   color: white;
 }
 .primaryBtn:hover { filter: brightness(1.05); }
+.primaryBtn:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+  filter: none;
+}
 
 .secondaryBtn {
   background: white;
@@ -325,7 +362,8 @@
 }
 
 .badgeRed,
-.badgeGold {
+.badgeGold,
+.badgeGreen {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -345,6 +383,11 @@
   background: rgba(197, 162, 93, 0.18);
   color: #7a5a1a;
   border: 1px solid rgba(197, 162, 93, 0.25);
+}
+.badgeGreen {
+  background: rgba(63, 180, 109, 0.14);
+  color: #1f7a46;
+  border: 1px solid rgba(63, 180, 109, 0.2);
 }
 
 .boldCell {
@@ -381,7 +424,132 @@
 }
 .actionBtnGhost:hover { background: #f7f9ff; }
 
+.classActionPanel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem;
+  border-radius: 24px;
+  border: 1px solid #e6ecf5;
+  background: linear-gradient(135deg, #ffffff 0%, #f7fbff 100%);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.035);
+}
+
+.classControls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: min(520px, 100%);
+}
+
+.classSelect {
+  flex: 1;
+  min-width: 260px;
+  padding: 0.72rem 0.85rem;
+  border-radius: 14px;
+  border: 1px solid #dbe3ef;
+  outline: none;
+  background: white;
+  color: #0b1a2b;
+  font-weight: 700;
+}
+
+.classSelect:focus {
+  border-color: #003366;
+  box-shadow: 0 0 0 4px rgba(0, 51, 102, 0.08);
+}
+
+.batchResult {
+  padding: 1rem 1.25rem;
+  border-radius: 18px;
+  border: 1px solid rgba(63, 180, 109, 0.22);
+  background: rgba(63, 180, 109, 0.1);
+  color: #1f7a46;
+  font-weight: 700;
+}
+
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(11, 26, 43, 0.48);
+  backdrop-filter: blur(4px);
+}
+
+.modalCard {
+  width: min(760px, 100%);
+  border-radius: 24px;
+  border: 1px solid #e5eaf3;
+  background: white;
+  padding: 1.5rem;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.22);
+}
+
+.templateLabel {
+  display: block;
+  margin: 1rem 0 0.45rem;
+  color: rgba(11, 26, 43, 0.75);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.templateBox {
+  width: 100%;
+  resize: vertical;
+  border: 1px solid #dbe3ef;
+  border-radius: 16px;
+  padding: 0.9rem;
+  color: #0b1a2b;
+  font: inherit;
+  line-height: 1.55;
+  outline: none;
+}
+
+.templateBox:focus {
+  border-color: #003366;
+  box-shadow: 0 0 0 4px rgba(0, 51, 102, 0.08);
+}
+
+.previewBox {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-left: 4px solid #c5a25d;
+  border-radius: 16px;
+  background: #fffaf0;
+  color: rgba(11, 26, 43, 0.78);
+  line-height: 1.6;
+}
+
+.previewBox strong {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: #0b1a2b;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
 @media (max-width: 1100px) {
   .statsGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .insightsGrid { grid-template-columns: 1fr; }
+  .governanceGrid { grid-template-columns: 1fr; }
+  .classActionPanel { align-items: stretch; flex-direction: column; }
+  .classControls { min-width: 100%; }
+}
+
+@media (max-width: 720px) {
+  .classControls { align-items: stretch; flex-direction: column; }
+  .classSelect { min-width: 100%; }
+  .tableHeader { align-items: flex-start; flex-direction: column; }
+  .tableActions { width: 100%; }
 }

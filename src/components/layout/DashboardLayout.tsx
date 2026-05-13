@@ -16,6 +16,9 @@ import {
   FileText,
   GraduationCap,
   Calendar,
+  Calendar1,
+  CalendarClock,
+  ListChecks,
 } from "lucide-react";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -33,13 +36,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           { href: "/lecturer/schedule", label: "Lịch giảng dạy", Icon: CalendarCheck2 },
           { href: "/lecturer/classes", label: "Lớp học của tôi", Icon: Users },
           
+          
         ]
       : [
     { href: "/student", label: "Tổng quan", Icon: LayoutDashboard },
     { href: "/student/calendar", label: "Thời khóa biểu", Icon: Calendar },
+    { href: "/student/exams", label: "Lịch thi", Icon: CalendarClock },
     { href: "/student/grades", label: "Điểm số", Icon: GraduationCap },
     { href: "/student/leave", label: "Nghỉ phép", Icon: FileText },
+    { href: "/student/plan", label: "Kế hoạch đăng ký", Icon: ListChecks },
     { href: "/student/chatbot", label: "AI Assistant", Icon: MessageSquare },
+    { href: "/student/profile", label: "Hồ sơ cá nhân", Icon: Users },
   ];
 
   const handleLogout = () => {

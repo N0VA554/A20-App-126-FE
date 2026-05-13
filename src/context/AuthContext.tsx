@@ -1,14 +1,12 @@
 "use client";
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { postJson } from "@/src/lib/api/http";
-import { PUBLIC_API_BASE_URL } from "@/src/lib/api/config";
-import { API_ROUTES } from "@/src/lib/api/routes";
+import { DEV_AUTH_BYPASS } from "@/src/lib/api/config";
 
-// 1. Định nghĩa Interface chuẩn
-export type UserRole = "LECTURER" | "STUDENT";
+export type UserRole = "LECTURER" | "STUDENT" | "ADMIN";
 
 export interface AuthUser {
-  created_at: string;
+  created_at?: string;
   email: string;
   full_name: string;
   is_active: number;
@@ -16,6 +14,7 @@ export interface AuthUser {
   uni_id: number;
   user_id: number;
   username: string;
+  token?: string;
 }
 
 interface AuthContextType {
@@ -25,16 +24,26 @@ interface AuthContextType {
   logout: () => void;
 }
 
-// 2. Khởi tạo Context với Type rõ ràng
 const AuthContext = createContext<AuthContextType | null>(null);
-
-const LS_KEY = "auth_user";
+const LS_KEY       = "auth_user";
+const LS_TOKEN_KEY = "auth_token";
+const DEV_BYPASS_TOKEN = "dev-bypass-token";
+const DEV_BYPASS_USER: AuthUser = {
+  created_at: "2026-05-11",
+  email: "dev-test@local",
+  full_name: "Dev Test Lecturer",
+  is_active: 1,
+  role: "LECTURER",
+  uni_id: 1,
+  user_id: 999,
+  username: "DEV_TEST",
+  token: DEV_BYPASS_TOKEN,
+};
 
 const normalizeRole = (value: string | undefined): UserRole => {
-  const normalized = String(value || "").trim().toUpperCase();
-  if (["LECTURER", "INSTRUCTOR", "TEACHER"].includes(normalized)) {
-    return "LECTURER";
-  }
+  const n = String(value || "").trim().toUpperCase();
+  if (["LECTURER", "INSTRUCTOR", "TEACHER"].includes(n)) return "LECTURER";
+  if (n === "ADMIN") return "ADMIN";
   return "STUDENT";
 };
 
@@ -43,47 +52,57 @@ const normalizeUser = (user: AuthUser): AuthUser => ({
   role: normalizeRole(user.role),
 });
 
+const getInitialUser = (): AuthUser | null => {
+  if (DEV_AUTH_BYPASS) return DEV_BYPASS_USER;
+  if (typeof window === "undefined") return null;
+
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    return raw ? normalizeUser(JSON.parse(raw) as AuthUser) : null;
+  } catch {
+    localStorage.removeItem(LS_KEY);
+    localStorage.removeItem(LS_TOKEN_KEY);
+    return null;
+  }
+};
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [isReady, setIsReady] = useState(false);
+  const [user, setUser] = useState<AuthUser | null>(getInitialUser);
+  const [isReady] = useState(true);
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(LS_KEY);
-      if (!raw) return;
-      const parsed = JSON.parse(raw) as AuthUser;
-      setUser(normalizeUser(parsed));
-    } catch {
-      localStorage.removeItem(LS_KEY);
-    } finally {
-      setIsReady(true);
+    if (DEV_AUTH_BYPASS) {
+      localStorage.setItem(LS_KEY, JSON.stringify(DEV_BYPASS_USER));
+      localStorage.setItem(LS_TOKEN_KEY, DEV_BYPASS_TOKEN);
     }
   }, []);
 
   const login = async (email: string, password: string) => {
-    const url = PUBLIC_API_BASE_URL
-      ? `${PUBLIC_API_BASE_URL}${API_ROUTES.auth.login}`
-      : "/api/auth/login";
-
     const res = await postJson<{
       success: boolean;
-      data?: { user?: AuthUser };
-    }>(url, { email, password });
+      data?: { user?: AuthUser; token?: string };
+      message?: string;
+      error?: string;
+    }>("/api/auth/login", { email, password });
 
-    const u = res.data?.user;
+    const u     = res.data?.user;
+    const token = res.data?.token;
     if (!res.success || !u) {
-      throw new Error("Login failed");
+      throw new Error(res.message || res.error || "Đăng nhập thất bại");
     }
 
-    const normalizedUser = normalizeUser(u);
+    const normalizedUser = normalizeUser({ ...u, token });
     setUser(normalizedUser);
     localStorage.setItem(LS_KEY, JSON.stringify(normalizedUser));
+    if (token) localStorage.setItem(LS_TOKEN_KEY, token);
+
     return normalizedUser;
   };
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem(LS_KEY);
+    localStorage.removeItem(LS_TOKEN_KEY);
   };
 
   return (
@@ -93,11 +112,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
-// 3. Hook có kiểm tra an toàn (Giúp bạn biết ngay nếu quên bọc AuthProvider)
 export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("Lỗi rồi! useAuth phải được dùng bên trong AuthProvider tại layout.tsx nhé.");
-  }
-  return context;
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error("useAuth phải dùng bên trong AuthProvider");
+  return ctx;
 };

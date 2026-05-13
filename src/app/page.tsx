@@ -2,12 +2,13 @@
 import styles from "./Login.module.css";
 import { useAuth } from "@/src/context/AuthContext";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Eye, EyeOff, Mail, Lock, Loader2 } from "lucide-react";
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { login, user, isReady } = useAuth();
   const router = useRouter();
+  
   
   // 1. Loại bỏ dữ liệu cứng
   const [email, setEmail] = useState("");
@@ -18,15 +19,20 @@ export default function LoginPage() {
   // 2. State cho ẩn/hiện mật khẩu
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  useEffect(() => {
+    if (!isReady || !user) return;
+    router.replace(user.role === "LECTURER" || user.role === "ADMIN" ? "/lecturer" : "/student");
+  }, [isReady, router, user]);
+
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); // Ngăn trang reload
     setIsLoading(true);
     setError(null);
     try {
       const u = await login(email, password);
       router.push(u.role === "LECTURER" ? "/lecturer" : "/student");
-    } catch (e: any) {
-      setError(e.message || "Email hoặc mật khẩu không chính xác");
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Email hoặc mật khẩu không chính xác");
     } finally {
       setIsLoading(false);
     }
@@ -66,7 +72,7 @@ export default function LoginPage() {
                 className={styles.input}
                 placeholder="Email của bạn"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
                 disabled={isLoading}
                 required
               />
@@ -80,7 +86,7 @@ export default function LoginPage() {
                 className={styles.input}
                 placeholder="Mật khẩu"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
                 disabled={isLoading}
                 required
               />
